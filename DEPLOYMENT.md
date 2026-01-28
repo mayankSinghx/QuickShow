@@ -16,14 +16,15 @@ Since this application uses **WebSockets (Socket.IO)** and a persistent **Expres
 
 Your Express server needs to stay "awake" to handle WebSocket events.
 
-1.  **Prepare for Deployment**:
-    - Ensure `apps/server/package.json` has a `start` script:
+    - **Build Command**: `npm install && npm run build`
+    - Ensure `apps/server/package.json` has these scripts (already added):
       ```json
       "scripts": {
-        "build": "tsc",
+        "build": "npx prisma generate && tsc",
         "start": "node dist/index.js"
       }
       ```
+    - **Note**: The backend now requires `pg` and `@prisma/adapter-pg` (already in `package.json`) to handle direct database connections in Prisma 7.
 2.  **Environment Variables**: Set these in your hosting provider:
     - `DATABASE_URL`: Your production Postgres connection string.
     - `PORT`: Usually provided by the host (e.g., `8080`).
@@ -44,7 +45,7 @@ Your Express server needs to stay "awake" to handle WebSocket events.
 
 1.  **Project Settings**:
     - **Root Directory**: `apps/web`
-    - **Build Command**: `next build`
+    - **Build Command**: `npm install && npm run build`
     - **Output Directory**: `.next`
 2.  **Environment Variables**:
     - `NEXT_PUBLIC_SOCKET_URL`: The URL of your deployed backend (e.g., `https://your-backend.railway.app`).
@@ -53,13 +54,16 @@ Your Express server needs to stay "awake" to handle WebSocket events.
 
 ---
 
-## 🗄 Part 3: Database (Prisma)
+## 🗄 Part 3: Database (Prisma 7)
 
-1.  **Migration**: Once your production DB is ready, run the migration from your local machine (pointing to the production URL) or via a CI/CD pipeline:
+Prisma 7 uses a refined connection strategy. You no longer have the `url` in `schema.prisma`. Instead, connectivity is handled by `prisma.config.js` and the Driver Adapter.
+
+1.  **Migration**: Once your production DB is ready, run the migration from your local machine. Since the schema lacks a hardcoded URL, the CLI will look at `prisma.config.js` which reads your `.env`.
     ```bash
+    # Ensure DATABASE_URL in your .env points to production
     npx prisma migrate deploy
     ```
-2.  **Generated Client**: Ensure `npx prisma generate` runs during your backend's build step.
+2.  **Generated Client**: The build step (`npm run build`) automatically runs `npx prisma generate`. In production, ensure the `DATABASE_URL` env var is available during this step so the internal client configuration is correctly mapped to your adapter.
 
 ---
 
