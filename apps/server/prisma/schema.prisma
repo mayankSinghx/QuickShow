@@ -1,0 +1,70 @@
+generator client {
+    provider = "prisma-client-js"
+}
+
+datasource db {
+    provider = "postgresql"
+    url      = env("DATABASE_URL")
+}
+
+model User {
+    id        String    @id @default(cuid())
+    email     String    @unique
+    password  String
+    name      String?
+    createdAt DateTime  @default(now())
+    rooms     Room[]
+    elements  Element[]
+}
+
+model Room {
+    id        String    @id @default(cuid())
+    name      String?
+    ownerId   String?
+    owner     User?     @relation(fields: [ownerId], references: [id])
+    createdAt DateTime  @default(now())
+    updatedAt DateTime  @updatedAt
+    elements  Element[]
+}
+
+model Element {
+    id          String   @id
+    roomId      String
+    room        Room     @relation(fields: [roomId], references: [id])
+    creatorId   String?
+    creator     User?    @relation(fields: [creatorId], references: [id])
+    type        String
+    x           Float
+    y           Float
+    width       Float
+    height      Float
+    rotation    Float
+    strokeColor String
+    fillColor   String
+    strokeWidth Float
+    points      Json?
+    text        String?
+    version     Int      @default(1)
+    updatedAt   DateTime @default(now())
+
+    versions ElementVersion[]
+}
+
+model ElementVersion {
+    id          String   @id @default(cuid())
+    elementId   String
+    element     Element  @relation(fields: [elementId], references: [id])
+    type        String
+    x           Float
+    y           Float
+    width       Float
+    height      Float
+    rotation    Float
+    strokeColor String
+    fillColor   String
+    strokeWidth Float
+    points      Json?
+    text        String?
+    version     Int
+    updatedAt   DateTime @default(now())
+}
