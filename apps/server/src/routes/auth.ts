@@ -26,8 +26,12 @@ router.post('/signup', async (req, res) => {
 
         const token = jwt.sign({ userId: user.id }, JWT_SECRET, { expiresIn: '7d' });
         res.status(201).json({ token, user: { id: user.id, email: user.email, name: user.name } });
-    } catch (error) {
-        res.status(500).json({ message: 'Internal server error' });
+    } catch (error: any) {
+        console.error('SIGNUP_ERROR:', error);
+        res.status(500).json({
+            message: 'Internal server error',
+            error: error.message || error
+        });
     }
 });
 
@@ -47,8 +51,12 @@ router.post('/login', async (req, res) => {
 
         const token = jwt.sign({ userId: user.id }, JWT_SECRET, { expiresIn: '7d' });
         res.json({ token, user: { id: user.id, email: user.email, name: user.name } });
-    } catch (error) {
-        res.status(500).json({ message: 'Internal server error' });
+    } catch (error: any) {
+        console.error('LOGIN_ERROR:', error);
+        res.status(500).json({
+            message: 'Internal server error',
+            error: error.message || error
+        });
     }
 });
 
