@@ -17,7 +17,7 @@ app.use('/api/auth', authRoutes);
 const httpServer = createServer(app);
 const io = new Server(httpServer, {
     cors: {
-        origin: ['quickshow-plum.vercel.app', 'http://localhost:3000'], // In production, restrict this
+        origin: ['https://quickshow-plum.vercel.app', 'http://localhost:3000'], // In production, restrict this
         methods: ['GET', 'POST'],
     },
 });
